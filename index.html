@@ -75,12 +75,46 @@
         });
         directionsDisplay.setMap(map);
 
+        infoWindow = new google.maps.InfoWindow;
+
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            infoWindow.setPosition(pos);
+            infoWindow.setContent('Location found.');
+            infoWindow.open(map);
+            map.setCenter(pos);
+            console.log("hello");
+            console.log(pos);
+            console.log(document.getElementById('start').value);
+
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
         var onChangeHandler = function() {
           calculateAndDisplayRoute(directionsService, directionsDisplay);
         };
+
+
+
+
+       
+
         document.getElementById('start').addEventListener('change', onChangeHandler);
         document.getElementById('end').addEventListener('change', onChangeHandler);
       }
+
+
+      // to display the route from A to B
 
       function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         directionsService.route({
@@ -95,9 +129,20 @@
           }
         });
       }
+
+        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+        infoWindow.open(map);
+      }
+
+       
+
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUhrHkabrGtSh4mT1GyjEx_laRHqS3Lzc&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHcxLjgimvHlg5HFEwep9bPx7tfoaZPvk&callback=initMap">
     </script>
   </body>
 </html>
