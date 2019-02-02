@@ -18,11 +18,13 @@
         padding: 0;
       }
     </style>
-  </head>
-  <body>
+    </head>
+    <body>
     <div id="googleMap" style="width:100%; height:600px;"></div>
     <div>
-     <input  type="text" id="mapsearch">
+    <input  type="text" id="mapsearch">
+    <button id="myBtn">Find Direction</button>
+
    </div>
     <script>
          function detectBrowser() {
@@ -38,7 +40,8 @@
             }
         }
 
-      var pos
+      var pos,end;
+
       function initMap() {
         var myLatLng = {lat: -25.363, lng: 131.044};
 
@@ -49,8 +52,8 @@
 
 
         var searchBox = new google.maps.places.SearchBox(document.getElementById('mapsearch'));
-          var directionsService = new google.maps.DirectionsService;
-            var directionsDisplay = new google.maps.DirectionsRenderer;
+        var directionsService = new google.maps.DirectionsService;
+        var directionsDisplay = new google.maps.DirectionsRenderer;
 
             // var input = document.getElementById('pac-input');
            
@@ -79,7 +82,29 @@
           // Browser doesn't support Geolocation
           handleLocationError(false, infoWindow, map.getCenter());
         }
-         var markers = [
+
+
+
+
+        var onChangeHandler = function() {
+             var locations = searchBox.getPlaces();
+             end = locations[0].place_id;
+            
+             var marker = new google.maps.Marker({
+             position: locations[0].geometry.location,
+             map: map,
+             title: locations[0].name
+            });
+           }
+
+
+
+
+
+
+        google.maps.event.addListener(searchBox, 'places_changed', onChangeHandler);
+
+        /* var markers = [
               
                 ['imperial oversees', 19.091584, 72.837677],
                
@@ -90,26 +115,33 @@
                     map: map,
                     
                 });
+          */
 
-             marker.addListener('click', function() {
-                    directionsService.route({
+          document.getElementById("myBtn").addEventListener("click", function(){
+          directionsService.route({
 
                         // origin: document.getElementById('start').value,
                         origin: pos,
 
                         // destination: marker.getPosition(),
-                        destination: position,
+                        destination: {
+                          //position
+
+                          placeId:end
+                        },
 
                         travelMode: 'WALKING'
                     }, function(response, status) {
                         if (status === 'OK') {
+                            //console.log(document.getElementById("mapsearch").value)
+
                             directionsDisplay.setDirections(response);
                         } else {
                             window.alert('Directions request failed due to ' + status);
                         }
                     });
+          });
 
-                });
 
       }
     </script>
