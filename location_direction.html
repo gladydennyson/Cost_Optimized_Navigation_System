@@ -21,14 +21,24 @@
     </head>
     <body>
     <div id="googleMap" style="width:100%; height:600px;"></div>
+    <div id="floating-panel">
+   <b>Mode of Travel: </b>
+   <select id="mode">
+    <option value="DRIVING">Driving</option>
+    <option value="WALKING">Walking</option>
+    <option value="BICYCLING">Bicycling</option>
+    <option value="TRANSIT">Transit</option>
+  </select>
+    </div>
     <div>
     <input  type="text" id="mapsearch">
     <button id="myBtn">Find Direction</button>
      <div id="output"></div>
      <p id="p1">This shows distance</p>
+     <p id="p2">This shows price</p>
     <button id="distance" onclick="distanceFinder()">Find Distance</button>
    
-
+   
    </div>
     <script>
          function detectBrowser() {
@@ -79,7 +89,7 @@
               lng: position.coords.longitude
             };
           console.log(pos.lat);
-
+          console.log(pos.lng);
           var marker = new google.maps.Marker({
           position: pos,
           map: map,
@@ -120,6 +130,7 @@
 
 
           document.getElementById("myBtn").addEventListener("click", function(){
+          var selectedMode = document.getElementById('mode').value;
           directionsService.route({
 
                         // origin: document.getElementById('start').value,
@@ -128,12 +139,14 @@
                         // destination: marker.getPosition(),
                         destination:dest,
 
-                        travelMode: 'WALKING'
+                        travelMode: google.maps.TravelMode[selectedMode]
                     }, function(response, status) {
                         if (status === 'OK') {
                            //console.log(pos);
                             //console.log(document.getElementById("mapsearch").value)
-                            //console.log(dest);
+                            console.log(response.routes[0]);
+                            console.log(response.routes[0].fare);
+                            document.getElementById("p2").innerHTML = response.routes[0].fare.text;
                             directionsDisplay.setDirections(response);
                         } else {
                             window.alert('Directions request failed due to ' + status);
@@ -168,7 +181,10 @@
         service.getDistanceMatrix({
           origins: [pos],
           destinations: [dest],
-          travelMode: 'DRIVING',
+          travelMode: 'TRANSIT',
+           transitOptions: {
+            modes: ['BUS', 'TRAIN']
+           },
           unitSystem: google.maps.UnitSystem.METRIC,
           avoidHighways: false,
           avoidTolls: false
@@ -199,9 +215,9 @@
         });
 
       }
+ 
 
-
-
+ 
 
         
 
@@ -214,7 +230,7 @@
     </script>
 
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHcxLjgimvHlg5HFEwep9bPx7tfoaZPvk&libraries=places&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=your_key_here&libraries=places&callback=initMap">
     </script>
   </body>
 </html>
